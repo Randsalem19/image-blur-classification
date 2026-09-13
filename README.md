@@ -315,8 +315,6 @@ image-blur-classification/
 ├── README.md
 └── requirements.txt
 
----
-
 ## 📄 Project Report
 
 A detailed project report covering the methodology, implementation, experiments, and results is available here:
