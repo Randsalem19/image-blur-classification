@@ -308,28 +308,20 @@ Confidence: 0.9778
 ## 📁 Repository Structure
 
 ```text
-Image-Blur-Classification/
+image-blur-classification/
 │
-├── notebooks/
-│   └── Image_Blur_Classification.ipynb
-│
-├── docs/
-│   └── Image_Blur_Classification_Report.pdf
-│
-├── .gitignore
-├── CREDITS.md
-├── LICENSE
+├── Image_Blur_Classification_Rand_Majed_Salem.ipynb
+├── Image_Blur_Classification_Report_Rand_Majed_Salem.pdf
 ├── README.md
 └── requirements.txt
-```
 
 ---
 
 ## 📄 Project Report
 
-A detailed project report covering the methodology, implementation, experiments, and results is included in the repository:
+A detailed project report covering the methodology, implementation, experiments, and results is available here:
 
-[`docs/Image_Blur_Classification_Report.pdf`](docs/Image_Blur_Classification_Report.pdf)
+[📄 View Project Report](Image_Blur_Classification_Report_Rand_Majed_Salem.pdf)
 
 ---
 
