@@ -23,36 +23,36 @@
 
 ## 📌 Project Overview
 
-Image blur is a common image-quality problem caused by motion, defocus, camera shake, or acquisition conditions. It reduces edge clarity and fine visual detail, which can negatively affect downstream computer-vision systems.
+This project builds a lightweight machine-learning pipeline to classify images as either **Sharp** or **Blurred**.
 
-This project builds a lightweight and interpretable machine-learning pipeline to classify images into two categories:
+Instead of training directly on raw pixels, the system extracts four handcrafted image-quality features and uses them as input to a **Scikit-learn Multi-Layer Perceptron (MLP)** classifier.
 
-- **Sharp**
-- **Blurred**
+Two optimization strategies are evaluated using the same network architecture:
 
-Instead of training directly on raw pixels, the project extracts a compact set of handcrafted image-quality features from each image and uses them as inputs to a **Scikit-learn Multi-Layer Perceptron (`MLPClassifier`)**.
+- **Adam**
+- **Stochastic Gradient Descent (SGD)**
 
-Two optimization strategies — **Adam** and **Stochastic Gradient Descent (SGD)** — are evaluated using the same network architecture to compare their performance on the blur-classification task.
+The best recorded result was achieved using **Adam**, with **94.81% test accuracy**.
 
 ---
 
 ## ✨ Project Highlights
 
-- Binary classification of **Sharp vs. Blurred** images.
-- Four handcrafted image-quality features combining spatial and frequency-domain information.
-- Image preprocessing with **OpenCV**.
-- Feature standardization using **StandardScaler**.
-- Neural-network classification using **MLPClassifier**.
-- Direct comparison between **Adam** and **SGD**.
-- Evaluation using accuracy, precision, recall, F1-score, and confusion matrices.
-- Reusable prediction pipeline for unseen images.
-- Fully runnable notebook available on **Google Colab**.
+- Binary classification: **Sharp vs. Blurred**
+- Handcrafted spatial and frequency-domain features
+- Image preprocessing with **OpenCV**
+- Feature standardization with **StandardScaler**
+- Neural-network classification using **MLPClassifier**
+- Comparison between **Adam** and **SGD**
+- Evaluation using accuracy, precision, recall, F1-score, and confusion matrices
+- Prediction workflow for unseen images
+- Fully runnable notebook on **Google Colab**
 
 ---
 
 ## 🚀 Run the Project
 
-The complete notebook can be opened directly in Google Colab:
+Open the complete notebook directly in Google Colab:
 
 ### [▶ Open Image Blur Classification in Google Colab](https://colab.research.google.com/drive/193vrYTJBat8rydM1tnBbaYfpOZVs4Snn)
 
@@ -60,33 +60,27 @@ The complete notebook can be opened directly in Google Colab:
 
 ## 📊 Dataset
 
-The project uses the public **Blur Dataset** available on Kaggle:
+The project uses the public **Blur Dataset** from Kaggle:
 
 **Dataset:** https://www.kaggle.com/datasets/kwentar/blur-dataset
 
-The original dataset contains three image categories:
+The selected subset contains:
 
-- Sharp images
-- Motion-blurred images
-- Defocus-blurred images
-
-For this binary classification task, motion blur and defocus blur are combined into a single **Blur** class.
-
-### Dataset Subset Used
-
-| Category | Number of Images |
+| Category | Images |
 |---|---:|
 | Sharp | 300 |
 | Defocus Blur | 300 |
 | Motion Blur | 300 |
 | **Total** | **900** |
 
-### Final Labels
+For binary classification:
 
 ```text
 0 → Sharp
 1 → Blur
 ```
+
+Motion-blurred and defocus-blurred images are combined into one **Blur** class.
 
 ---
 
@@ -118,58 +112,41 @@ Prediction on New Images
 
 ---
 
-## 🖼️ Image Preprocessing
-
-Each image is processed through the same preparation pipeline before feature extraction:
-
-1. Load the image using OpenCV.
-2. Convert it to grayscale.
-3. Resize it to **256 × 256 pixels**.
-4. Extract the four image-quality features used by the classifier.
-
-Using grayscale images reduces computational complexity while retaining the structural information needed to analyze image sharpness.
-
----
-
 ## 🧠 Feature Engineering
 
-Each image is represented using four numerical image-quality features.
+Each image is represented using four numerical features:
 
 | Feature | Description |
 |---|---|
-| **Variance of Laplacian** | Measures edge sharpness and local detail. |
-| **Tenengrad** | Uses Sobel gradients to measure edge strength. |
-| **Image Contrast** | Measures variation in image intensity values. |
-| **High-Frequency Energy (FFT)** | Measures frequency-domain detail associated with sharp visual content. |
+| **Variance of Laplacian** | Measures edge sharpness and local detail |
+| **Tenengrad** | Measures edge strength using Sobel gradients |
+| **Image Contrast** | Measures variation in image intensity |
+| **High-Frequency Energy (FFT)** | Measures high-frequency detail associated with sharpness |
 
-The final input vector is:
+Final feature vector:
 
 ```text
 [Laplacian Variance, Tenengrad, Contrast, FFT Energy]
 ```
 
-This approach provides a compact and interpretable representation instead of feeding the full image directly into the model.
-
 ---
 
 ## 🔧 Data Preparation
 
-The 900-image subset is divided using a **stratified 70/30 train-test split**.
+The dataset is split using a **stratified 70/30 train-test split**:
 
 | Split | Samples |
 |---|---:|
 | Training | 630 |
 | Testing | 270 |
 
-The numerical features are standardized using `StandardScaler`.
-
-The scaler is fitted only on the training data and then applied to the testing data to keep the evaluation pipeline consistent.
+Features are standardized using `StandardScaler`.
 
 ---
 
 ## 🤖 Model Architecture
 
-The project uses a **Multi-Layer Perceptron (MLP)** neural network with two hidden layers.
+The classifier is a Multi-Layer Perceptron with two hidden layers:
 
 ```text
 4 Input Features
@@ -183,7 +160,7 @@ Binary Classification
 Sharp / Blur
 ```
 
-### Core Configuration
+Core configuration:
 
 ```python
 MLPClassifier(
@@ -194,114 +171,59 @@ MLPClassifier(
 )
 ```
 
-Two solvers are evaluated independently:
-
-```text
-Adam
-SGD
-```
-
 ---
 
-## 📈 Experimental Results
-
-### 🥇 Adam Optimizer
-
-Adam achieved the strongest overall performance in the recorded experiment.
-
-| Metric | Result |
-|---|---:|
-| **Accuracy** | **94.81%** |
-| Sharp Precision | 89% |
-| Sharp Recall | 97% |
-| Sharp F1-score | 93% |
-| Blur Precision | 98% |
-| Blur Recall | 94% |
-| Blur F1-score | 96% |
-
-### Confusion Matrix — Adam
-
-```text
-[[ 87   3]
- [ 11 169]]
-```
-
-Out of the 270 test images, the Adam model correctly classified **256 images**.
-
----
-
-### SGD Optimizer
-
-| Metric | Result |
-|---|---:|
-| **Accuracy** | **92.59%** |
-| Sharp Precision | 87% |
-| Sharp Recall | 91% |
-| Sharp F1-score | 89% |
-| Blur Precision | 95% |
-| Blur Recall | 93% |
-| Blur F1-score | 94% |
-
-### Confusion Matrix — SGD
-
-```text
-[[ 82   8]
- [ 12 168]]
-```
-
----
-
-## 🏆 Adam vs. SGD
+## 📈 Results
 
 | Optimizer | Test Accuracy |
 |---|---:|
 | **Adam** | **94.81%** |
 | SGD | 92.59% |
 
-Adam produced the best classification accuracy in this experiment and is therefore used by the notebook's final prediction workflow.
+### Adam
+
+```text
+Confusion Matrix:
+[[ 87   3]
+ [ 11 169]]
+```
+
+### SGD
+
+```text
+Confusion Matrix:
+[[ 82   8]
+ [ 12 168]]
+```
+
+Adam produced the strongest recorded performance and is used in the final prediction workflow.
 
 ---
 
 ## 🔮 Predicting New Images
 
-The notebook includes a reusable prediction workflow for unseen images.
-
 For each new image, the system:
 
-1. Loads the image.
-2. Converts it to grayscale.
-3. Resizes it to `256 × 256`.
-4. Extracts the same four handcrafted features.
-5. Applies the fitted scaler.
-6. Passes the feature vector to the trained Adam MLP model.
-7. Returns the predicted class and confidence score.
+1. Loads the image
+2. Converts it to grayscale
+3. Resizes it to `256 × 256`
+4. Extracts the four handcrafted features
+5. Applies the fitted scaler
+6. Runs the trained MLP model
+7. Returns the predicted class and confidence score
 
-Example output:
+Example:
 
 ```text
 Prediction: Sharp
 Confidence: 0.9933
 ```
 
-or:
-
-```text
-Prediction: Blur
-Confidence: 0.9778
-```
-
 ---
 
 ## 🛠️ Technologies Used
 
-- **Python**
-- **OpenCV**
-- **NumPy**
-- **Scikit-learn**
-- **Matplotlib**
-- **Jupyter Notebook**
-- **Google Colab**
-- **Kaggle**
+`Python` · `OpenCV` · `NumPy` · `Scikit-learn` · `Matplotlib` · `Jupyter Notebook` · `Google Colab` · `Kaggle`
 
 ---
 
@@ -314,10 +236,13 @@ image-blur-classification/
 ├── Image_Blur_Classification_Report_Rand_Majed_Salem.pdf
 ├── README.md
 └── requirements.txt
+```
+
+---
 
 ## 📄 Project Report
 
-A detailed project report covering the methodology, implementation, experiments, and results is available here:
+A detailed report covering the methodology, implementation, experiments, and results is available here:
 
 [📄 View Project Report](Image_Blur_Classification_Report_Rand_Majed_Salem.pdf)
 
@@ -326,23 +251,20 @@ A detailed project report covering the methodology, implementation, experiments,
 ## ⚠️ Limitations
 
 - The selected subset contains more blurred images than sharp images.
-- The classifier relies on handcrafted features rather than end-to-end image representation learning.
-- Results may vary on images captured under conditions that differ significantly from the source dataset.
-- Both MLP configurations use a fixed `max_iter=300`, so further convergence and hyperparameter analysis could improve performance.
+- The classifier relies on handcrafted features rather than end-to-end representation learning.
+- Performance may vary on images from substantially different capture conditions.
+- Both MLP configurations use a fixed `max_iter=300`, so further tuning may improve convergence.
 
 ---
 
 ## 🔭 Future Improvements
 
-Possible extensions include:
-
-- Compare the current approach with **Convolutional Neural Networks (CNNs)**.
-- Evaluate additional blur-detection features.
-- Perform systematic hyperparameter optimization.
-- Test the model on additional external datasets.
-- Expand the dataset with more real-world blur conditions.
-- Estimate **blur severity** instead of only performing binary classification.
-- Deploy the classifier as a lightweight web application or REST API.
+- Compare the current method with **CNN-based models**
+- Perform systematic hyperparameter optimization
+- Evaluate additional blur-detection features
+- Test on additional external datasets
+- Estimate **blur severity**, not only binary blur classification
+- Deploy the model as a lightweight web application or REST API
 
 ---
 
@@ -356,15 +278,7 @@ Data Science & Artificial Intelligence
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Rand%20Majed%20Salem-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/rand-majed-salem/)
 [![Kaggle](https://img.shields.io/badge/Kaggle-randsalem-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)](https://www.kaggle.com/randsalem)
 
-### Project Links
-
-- **Google Colab:** https://colab.research.google.com/drive/193vrYTJBat8rydM1tnBbaYfpOZVs4Snn
-- **GitHub Profile:** https://github.com/Randsalem19
-- **LinkedIn:** https://www.linkedin.com/in/rand-majed-salem/
-- **Kaggle:** https://www.kaggle.com/randsalem
-
 ---
-
 
 <p align="center">
   <strong>⭐ If you find this project useful or interesting, consider starring the repository.</strong>
